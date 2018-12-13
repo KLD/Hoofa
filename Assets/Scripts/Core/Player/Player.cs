@@ -56,34 +56,6 @@ namespace ChainedRam.Core.Player
         }
 
         /// <summary>
-        /// Move up or left right 
-        /// </summary>
-        void FixedUpdate2()
-        {
-            foreach (var pair in ArrowsDirectionDic)
-            {
-                if (Input.GetKey(pair.Key) && false)
-                {
-                    if (pair.Key == "up" )
-                    {
-                        if (CanJump)
-                        {
-                            CanJump = false;
-                            rigidbody2D.velocity += Vector2.up * JumpHeight * Time.fixedDeltaTime;
-                        }
-                    }
-                    else
-                    {
-                        ApplyStatusEffects();
-                        MovePlayer(pair.Value); ///define player profile struct
-                    }
-                }
-            }
-
-            ClearEndedStatudEffects(); 
-        }
-
-        /// <summary>
         /// Moves play to a direction based on it's speed. 
         /// </summary>
         /// <param name="direction"></param>
@@ -232,6 +204,7 @@ namespace ChainedRam.Core.Player
 
         public override void RequestCast(string action)
         {
+            ApplyStatusEffects();
             switch (action)
             {
                 case "jump":
@@ -248,7 +221,7 @@ namespace ChainedRam.Core.Player
                     break; 
 
             }
-
+            ClearEndedStatudEffects();
         }
         #endregion
     }
