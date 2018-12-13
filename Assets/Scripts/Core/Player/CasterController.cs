@@ -14,9 +14,12 @@ public abstract class CasterController<A> : MonoBehaviour
 {
 
     //TODO
-    public abstract IEnumerable<Caster<A>> CasterListeners { get; }
+    public abstract Caster<A> Caster { get; }
     
     public abstract Dictionary<KeyCode, A> KeyDownMap { get; protected set; }
+
+
+    public HashSet<A> ActiveActions = new HashSet<A>(); 
 
     /// <summary>s
     /// protecteded
@@ -27,39 +30,53 @@ public abstract class CasterController<A> : MonoBehaviour
         switch (current.type)
         {
             case EventType.KeyDown:
+
                 if (KeyDownMap.ContainsKey(current.keyCode))
                 {
-                    print("Cast " + KeyDownMap[current.keyCode]); 
-                   //RequestCasters(KeyDownMap[current.keyCode]); 
+                    ActiveActions.Add(KeyDownMap[current.keyCode]); 
                 }
-                break; 
+                break;
+            case EventType.KeyUp:
+                if (KeyDownMap.ContainsKey(current.keyCode))
+                {
+                    ActiveActions.Remove(KeyDownMap[current.keyCode]);
+                }
+                break;
         }
     }
 
     private void RequestCasters(A action)
     {
-        foreach(var caster in CasterListeners)
+        Caster.RequestCast(action); 
+    }
+
+
+
+    private void FixedUpdate()
+    {
+        foreach(var action in ActiveActions)
         {
-            caster.RequestCast(action); 
+            RequestCasters(action); 
         }
     }
+
+
+
 }
 public class CasterController : CasterController<string>
 {
     public KeyCodeString[] KeyCodeString;
+    private Caster<string> Target; 
 
     private void Start()
     {
+        Target = this.gameObject.GetComponent<Caster<string>>();
         KeyDownMap = KeyCodeString.ToDictionary(p => (KeyCode) p.Key.Value, p => p.Value);
     }
 
-    public override IEnumerable<Caster<string>> CasterListeners
-    {
-        get
-        {
-            return null; 
-        }
-    }
+
+    public override Caster<string> Caster => Target;
+
 
     public override Dictionary<KeyCode, string> KeyDownMap
     {

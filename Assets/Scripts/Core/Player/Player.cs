@@ -8,7 +8,7 @@ using UnityEngine;
 namespace ChainedRam.Core.Player
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class Player : MonoBehaviour
+    public class Player : Caster<string>
     {
         #region Inspecter Variables
         [Header("Player Properties")]
@@ -58,11 +58,11 @@ namespace ChainedRam.Core.Player
         /// <summary>
         /// Move up or left right 
         /// </summary>
-        void FixedUpdate()
+        void FixedUpdate2()
         {
             foreach (var pair in ArrowsDirectionDic)
             {
-                if (Input.GetKey(pair.Key))
+                if (Input.GetKey(pair.Key) && false)
                 {
                     if (pair.Key == "up" )
                     {
@@ -91,7 +91,7 @@ namespace ChainedRam.Core.Player
         {
             if (CanMove)
             {
-                rigidbody2D.velocity += direction * ((Speed * SpeedDelta)) * Time.fixedDeltaTime;
+                rigidbody2D.velocity = new Vector2(direction.x * ((Speed * SpeedDelta)) * Time.fixedDeltaTime, rigidbody2D.velocity.y);
             }
         }
 
@@ -228,6 +228,27 @@ namespace ChainedRam.Core.Player
         public void AddVelocity(Vector2 power)
         {
             rigidbody2D.velocity += power;
+        }
+
+        public override void RequestCast(string action)
+        {
+            switch (action)
+            {
+                case "jump":
+                    if (CanJump)
+                    {
+                        CanJump = false;
+                        rigidbody2D.velocity += Vector2.up * JumpHeight * Time.fixedDeltaTime;
+                    }
+                    break;
+
+                case "left":
+                case "right":
+                    MovePlayer(ArrowsDirectionDic[action]); ///define player profile struct
+                    break; 
+
+            }
+
         }
         #endregion
     }
