@@ -16,10 +16,12 @@ namespace ChainedRam.Core.Player
         /// Speed in which the object will move. 
         /// </summary>
         public float Speed;
-
+        public float JumpHeight;
         public bool CanMove; 
         public float SpeedDelta;  
         public int Health;
+
+        public bool CanJump; 
 
         #endregion
         #region Private Variables
@@ -38,6 +40,7 @@ namespace ChainedRam.Core.Player
         #region Unity Methods
         private void Start()
         {
+            CanJump = false; 
             CanMove = true;
             SpeedDelta = 1; 
             Effects = new List<KeyValue<IStatusEffect, float>>(); 
@@ -45,8 +48,7 @@ namespace ChainedRam.Core.Player
 
             ArrowsDirectionDic = new Dictionary<string, Vector2>()
             {
-                { "up", Vector2.up },
-                { "down", Vector2.down },
+                {"up", Vector2.up }, 
                 { "right", Vector2.right },
                 { "left", Vector2.left }
             };
@@ -62,8 +64,19 @@ namespace ChainedRam.Core.Player
             {
                 if (Input.GetKey(pair.Key))
                 {
-                    ApplyStatusEffects();
-                    MovePlayer(pair.Value); ///define player profile struct
+                    if (pair.Key == "up" )
+                    {
+                        if (CanJump)
+                        {
+                            CanJump = false;
+                            rigidbody2D.velocity += Vector2.up * JumpHeight * Time.fixedDeltaTime;
+                        }
+                    }
+                    else
+                    {
+                        ApplyStatusEffects();
+                        MovePlayer(pair.Value); ///define player profile struct
+                    }
                 }
             }
 
